@@ -1,18 +1,18 @@
 package booking
 
 type Service struct {
-	store Store
+	st *ConcurrentStore
 }
 
-func NewService(store Store) *Service {
-	return &Service{store}
+func NewService(st *ConcurrentStore) *Service {
+	return &Service{st}
 }
 
 func (s *Service) Book(b Booking) error {
-	return s.store.Book(b)
+	return s.st.Book(b)
 
 }
 
 func (s *Service) ListBookings(MovieId string) []Booking {
-	return s.store.ListBookings(MovieId)
+	return s.st.ListBookings(MovieId)
 }

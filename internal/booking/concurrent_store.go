@@ -1,27 +1,39 @@
 package booking
 
-type Store struct {
+import (
+	"sync"
+)
+
+type ConcurrentStore struct {
 	bookings map[string]Booking
+	sync.RWMutex
 }
 
-func NewStore() *Store {
-	return &Store{
+func NewConcurrentStore() *ConcurrentStore {
+	return &ConcurrentStore{
 		bookings: make(map[string]Booking),
 	}
 
 }
 
-func (s *Store) Book(b Booking) error {
+func (s *ConcurrentStore) Book(b Booking) error {
+	s.Lock()
+	defer s.Unlock()
+
 	if _, exists := s.bookings[b.SeatId]; exists {
 		return SeatAlreadyOccupied
 	}
 
 	s.bookings[b.SeatId] = b
+
 	return nil
 
 }
 
-func (s *Store) ListBookings(MovieId string) []Booking {
+func (s *ConcurrentStore) ListBookings(MovieId string) []Booking {
+
+	s.RLock()
+	defer s.RUnlock()
 	ans := make([]Booking, 0)
 
 	for _, v := range s.bookings {
