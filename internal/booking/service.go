@@ -9,9 +9,10 @@ func NewService(store Store) *Service {
 }
 
 func (s *Service) Book(b Booking) error {
+	return s.store.Book(b)
 
 }
 
 func (s *Service) ListBookings(MovieId string) []Booking {
-
+	return s.store.ListBookings(MovieId)
 }
