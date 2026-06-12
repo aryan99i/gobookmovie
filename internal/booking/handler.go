@@ -47,8 +47,8 @@ type holdSeatRequest struct {
 }
 
 func (h *Handler) HoldSeat(w http.ResponseWriter, r *http.Request) {
-	movieID := r.PathValue("movieID")
-	seatID := r.PathValue("seatID")
+	movieID := r.PathValue("movieId")
+	seatID := r.PathValue("seatId")
 
 	var req holdSeatRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
