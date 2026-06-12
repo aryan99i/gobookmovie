@@ -3,7 +3,6 @@ package booking
 import (
 	"encoding/json"
 	"goprojv2/internal/utils"
-	"log"
 	"net/http"
 	"time"
 )
@@ -52,7 +51,7 @@ func (h *Handler) HoldSeat(w http.ResponseWriter, r *http.Request) {
 
 	var req holdSeatRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		log.Println(err)
+		utils.WriteError(w, http.StatusBadRequest, "invalid request")
 		return
 	}
 
@@ -64,7 +63,7 @@ func (h *Handler) HoldSeat(w http.ResponseWriter, r *http.Request) {
 
 	session, err := h.svc.Book(data)
 	if err != nil {
-		log.Println(err)
+		utils.WriteError(w, http.StatusConflict, err.Error())
 		return
 	}
 
@@ -81,4 +80,64 @@ func (h *Handler) HoldSeat(w http.ResponseWriter, r *http.Request) {
 		SessionID: session.ID,
 		ExpiresAt: session.ExpiresAt.Format(time.RFC3339),
 	})
+}
+
+func (h *Handler) ConfirmSession(w http.ResponseWriter, r *http.Request) {
+	sessionID := r.PathValue("sessionID")
+
+	var req holdSeatRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		utils.WriteError(w, http.StatusBadRequest, "invalid request")
+		return
+	}
+
+	if req.UserID == "" {
+		utils.WriteError(w, http.StatusBadRequest, "missing user_id")
+		return
+	}
+
+	session, err := h.svc.ConfirmSeat(r.Context(), sessionID, req.UserID)
+	if err != nil {
+		utils.WriteError(w, http.StatusConflict, err.Error())
+		return
+	}
+
+	utils.WriteJSON(w, http.StatusOK, sessionResponse{
+		SessionID: session.ID,
+		MovieID:   session.MovieId,
+		SeatID:    session.SeatId,
+		UserID:    req.UserID,
+		Status:    session.Status,
+	})
+}
+
+type sessionResponse struct {
+	SessionID string `json:"session_id"`
+	MovieID   string `json:"movie_id"`
+	SeatID    string `json:"seat_id"`
+	UserID    string `json:"user_id"`
+	Status    string `json:"status"`
+	ExpiresAt string `json:"expires_at,omitempty"`
+}
+
+func (h *Handler) ReleaseSession(w http.ResponseWriter, r *http.Request) {
+	sessionID := r.PathValue("sessionID")
+
+	var req holdSeatRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		utils.WriteError(w, http.StatusBadRequest, "invalid request")
+		return
+	}
+	if req.UserID == "" {
+		utils.WriteError(w, http.StatusBadRequest, "missing user_id")
+		return
+	}
+
+	err := h.svc.ReleaseSeat(r.Context(), sessionID, req.UserID)
+	if err != nil {
+		utils.WriteError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
 }

@@ -22,6 +22,9 @@ func main() {
 	mux.HandleFunc("GET /movies/{movieId}/seats", bookingHandler.ListSeats)
 	mux.HandleFunc("POST /movies/{movieId}/seats/{seatId}/hold", bookingHandler.HoldSeat)
 
+	mux.HandleFunc("PUT /sessions/{sessionID}/confirm", bookingHandler.ConfirmSession)
+	mux.HandleFunc("DELETE /sessions/{sessionID}", bookingHandler.ReleaseSession)
+
 	if err := http.ListenAndServe(":8000", mux); err != nil {
 		log.Fatal("Error with server")
 	}

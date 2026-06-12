@@ -1,5 +1,7 @@
 package booking
 
+import "context"
+
 type Service struct {
 	st BookingStore
 }
@@ -15,4 +17,12 @@ func (s *Service) Book(b Booking) (Booking, error) {
 
 func (s *Service) ListBookings(MovieId string) []Booking {
 	return s.st.ListBookings(MovieId)
+}
+
+func (s *Service) ConfirmSeat(ctx context.Context, sessionID string, userID string) (Booking, error) {
+	return s.st.Confirm(ctx, sessionID, userID)
+}
+
+func (s *Service) ReleaseSeat(ctx context.Context, sessionID string, userID string) error {
+	return s.st.Release(ctx, sessionID, userID)
 }

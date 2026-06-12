@@ -38,16 +38,20 @@ function App() {
   const releaseActiveSession = async () => {
     if (!activeSession) return;
     try {
-      await fetch(`/sessions/${activeSession.sessionID}`, {
+      const res = await fetch(`/sessions/${activeSession.sessionID}`, {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ user_id: userID }),
       });
+      if (!res.ok) {
+        throw new Error("Failed to release seat");
+      }
+      setActiveSession(null);
+      setCheckoutStatus(null);
     } catch (e) {
       console.error(e);
+      showStatus(e.message, "error");
     }
-    setActiveSession(null);
-    setCheckoutStatus(null);
   };
 
   const handleMovieSelect = (movie) => {
