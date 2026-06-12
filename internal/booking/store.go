@@ -11,13 +11,13 @@ func NewStore() *Store {
 
 }
 
-func (s *Store) Book(b Booking) error {
+func (s *Store) Book(b Booking) (Booking, error) {
 	if _, exists := s.bookings[b.SeatId]; exists {
-		return SeatAlreadyOccupied
+		return Booking{}, SeatAlreadyOccupied
 	}
 
 	s.bookings[b.SeatId] = b
-	return nil
+	return b, nil
 
 }
 

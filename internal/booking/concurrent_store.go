@@ -16,17 +16,17 @@ func NewConcurrentStore() *ConcurrentStore {
 
 }
 
-func (s *ConcurrentStore) Book(b Booking) error {
+func (s *ConcurrentStore) Book(b Booking) (Booking, error) {
 	s.Lock()
 	defer s.Unlock()
 
 	if _, exists := s.bookings[b.SeatId]; exists {
-		return SeatAlreadyOccupied
+		return Booking{}, SeatAlreadyOccupied
 	}
 
 	s.bookings[b.SeatId] = b
 
-	return nil
+	return b, nil
 
 }
 

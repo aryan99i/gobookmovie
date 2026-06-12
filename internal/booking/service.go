@@ -1,14 +1,14 @@
 package booking
 
 type Service struct {
-	st *ConcurrentStore
+	st BookingStore
 }
 
-func NewService(st *ConcurrentStore) *Service {
+func NewService(st BookingStore) *Service {
 	return &Service{st}
 }
 
-func (s *Service) Book(b Booking) error {
+func (s *Service) Book(b Booking) (Booking, error) {
 	return s.st.Book(b)
 
 }

@@ -2,6 +2,7 @@ package booking
 
 import (
 	"errors"
+	"time"
 )
 
 var (
@@ -9,14 +10,15 @@ var (
 )
 
 type Booking struct {
-	ID      string
-	UserId  string
-	MovieId string
-	SeatId  string
-	Status  string
+	ID        string
+	UserId    string
+	MovieId   string
+	SeatId    string
+	Status    string
+	ExpiresAt time.Time
 }
 
 type BookingStore interface {
-	Book(b Booking) error
+	Book(b Booking) (Booking, error)
 	ListBookings(MovieId string) []Booking
 }
